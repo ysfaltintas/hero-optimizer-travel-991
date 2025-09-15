@@ -77,84 +77,124 @@ const SearchResults = () => {
     setLoading(true);
     try {
       const apiKey = import.meta.env.VITE_API_KEY;
-      const apiBase = import.meta.env.VITE_API_BASE;
 
-      if (!apiKey || !apiBase) {
-        throw new Error('API configuration missing');
+      if (!apiKey) {
+        throw new Error('API key missing');
       }
 
-      // API parametrelerini hazırla
-      const params = new URLSearchParams({
-        key: apiKey,
-        q: searchFilters.location || 'hotel',
-        checkin: searchFilters.checkIn || '',
-        checkout: searchFilters.checkOut || '', 
-        adults: searchFilters.adults.toString(),
-        children: searchFilters.children.toString(),
-        rooms: searchFilters.rooms.toString(),
-        sort: searchFilters.sortBy === 'price-low' ? 'price_asc' : 
-              searchFilters.sortBy === 'price-high' ? 'price_desc' :
-              searchFilters.sortBy === 'rating' ? 'rating' : 'recommended'
-      });
-
-      // Fiyat filtreleri
-      if (searchFilters.minPrice) {
-        params.append('min_price', searchFilters.minPrice.toString());
-      }
-      if (searchFilters.maxPrice) {
-        params.append('max_price', searchFilters.maxPrice.toString());
-      }
-
-      // Yıldız filtreleri
-      if (searchFilters.starRating.length > 0) {
-        const stars = searchFilters.starRating.map(s => s.replace('-star', '')).join(',');
-        params.append('stars', stars);
-      }
-
-      // CORS proxy kullan
-      const proxyUrl = 'https://api.allorigins.win/raw?url=';
-      const targetUrl = encodeURIComponent(`${apiBase}/hotels?${params}`);
+      let hotels: Hotel[] = [];
       
-      console.log('API URL:', `${apiBase}/hotels?${params}`);
-      
-      const response = await fetch(`${proxyUrl}${targetUrl}`, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json'
+      // Eğer lokasyon varsa city ID'yi al, yoksa varsayılan otelleri göster
+      if (searchFilters.location) {
+        console.log('Searching for city:', searchFilters.location);
+        
+        // Mapping API ile city ID'yi al
+        const mappingResponse = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(`https://api.makcorps.com/mapping?api_key=${apiKey}&name=${encodeURIComponent(searchFilters.location)}`)}`);
+        
+        if (mappingResponse.ok) {
+          const mappingData = await mappingResponse.json();
+          const parsedMapping = JSON.parse(mappingData.contents);
+          console.log('City mapping response:', parsedMapping);
+          
+          if (parsedMapping.data && parsedMapping.data.length > 0) {
+            const cityId = parsedMapping.data[0].document_id;
+            console.log('Found city ID:', cityId);
+            
+            // Hotel API ile otelleri al
+            const hotelParams = new URLSearchParams({
+              api_key: apiKey,
+              cityid: cityId,
+              pagination: '0',
+              cur: 'USD',
+              rooms: searchFilters.rooms.toString(),
+              adults: searchFilters.adults.toString(),
+              checkin: searchFilters.checkIn || '2024-12-25',
+              checkout: searchFilters.checkOut || '2024-12-26',
+              children: searchFilters.children.toString()
+            });
+
+            const hotelResponse = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(`https://api.makcorps.com/city?${hotelParams}`)}`);
+            
+            if (hotelResponse.ok) {
+              const hotelData = await hotelResponse.json();
+              const parsedHotels = JSON.parse(hotelData.contents);
+              console.log('Hotels API response:', parsedHotels);
+              
+              // API response'ını Hotel interface'ine dönüştür
+              hotels = (parsedHotels.data || []).map((hotel: any, index: number) => ({
+                id: hotel.hotel_id || index + 1,
+                name: hotel.hotel_name || hotel.name || `Hotel ${index + 1}`,
+                location: hotel.address || hotel.location || searchFilters.location,
+                distance: hotel.distance || `${Math.floor(Math.random() * 5) + 1} km to city center`,
+                image: hotel.main_photo_url || hotel.image || '/lovable-uploads/e6764045-1a5d-4f3d-80b8-d6ba711e528d.png',
+                rating: parseFloat(hotel.review_score || hotel.rating || (Math.random() * 2 + 8).toFixed(1)),
+                reviews: parseInt(hotel.review_nr || hotel.reviews || Math.floor(Math.random() * 3000) + 500),
+                roomType: hotel.room_type || 'Standart Oda',
+                bedType: hotel.bed_type || '1 çift kişilik yatak',
+                amenities: hotel.facilities ? hotel.facilities.slice(0, 4) : ['WiFi', 'Kahvaltı'],
+                price: parseInt(hotel.min_total_price || hotel.price || Math.floor(Math.random() * 200) + 50),
+                originalPrice: hotel.original_price,
+                nights: parseInt(searchFilters.checkIn && searchFilters.checkOut ? 
+                  Math.ceil((new Date(searchFilters.checkOut).getTime() - new Date(searchFilters.checkIn).getTime()) / (1000 * 60 * 60 * 24)).toString() : '1') || 1,
+                guests: searchFilters.adults + searchFilters.children,
+                taxes: parseInt(hotel.taxes || Math.floor(Math.random() * 100) + 50),
+                freeCancellation: hotel.free_cancellation || Math.random() > 0.5,
+                stars: parseInt(hotel.class || hotel.stars || Math.floor(Math.random() * 3) + 3)
+              }));
+            }
+          }
         }
-      });
-      
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
       }
       
-      const data = await response.json();
-      console.log('API Response:', data);
-      
-      // API response'ını Hotel interface'ine dönüştür
-      const hotels: Hotel[] = (data.hotels || data.results || data || []).map((hotel: any, index: number) => ({
-        id: hotel.id || index + 1,
-        name: hotel.name || hotel.hotel_name || `Hotel ${index + 1}`,
-        location: hotel.location || hotel.address || hotel.city || 'Unknown Location',
-        distance: hotel.distance || hotel.distance_to_center || `${Math.floor(Math.random() * 5) + 1} km to city center`,
-        image: hotel.image || hotel.photo || hotel.thumbnail || '/lovable-uploads/e6764045-1a5d-4f3d-80b8-d6ba711e528d.png',
-        rating: hotel.rating || hotel.guest_rating || hotel.score || (Math.random() * 2 + 8).toFixed(1),
-        reviews: hotel.reviews || hotel.review_count || Math.floor(Math.random() * 3000) + 500,
-        roomType: hotel.room_type || hotel.roomType || 'Standart Oda',
-        bedType: hotel.bed_type || hotel.bedType || '1 çift kişilik yatak',
-        amenities: hotel.amenities || hotel.facilities || ['WiFi', 'Kahvaltı'],
-        price: hotel.price || hotel.rate || hotel.price_per_night || Math.floor(Math.random() * 200) + 50,
-        originalPrice: hotel.original_price || hotel.originalPrice,
-        nights: parseInt(searchFilters.checkIn && searchFilters.checkOut ? 
-          Math.ceil((new Date(searchFilters.checkOut).getTime() - new Date(searchFilters.checkIn).getTime()) / (1000 * 60 * 60 * 24)).toString() : '1') || 1,
-        guests: searchFilters.adults + searchFilters.children,
-        taxes: hotel.taxes || Math.floor(Math.random() * 100) + 50,
-        freeCancellation: hotel.free_cancellation || hotel.freeCancellation || Math.random() > 0.5,
-        stars: hotel.stars || hotel.star_rating || Math.floor(Math.random() * 3) + 3
-      }));
+      // Eğer API'den veri gelmezse fallback data göster
+      if (hotels.length === 0) {
+        hotels = [
+          {
+            id: 1,
+            name: "The Montcalm At Brewery London City",
+            location: searchFilters.location || "Westminster Borough, London",
+            distance: "2 km to city center",
+            image: "/lovable-uploads/e6764045-1a5d-4f3d-80b8-d6ba711e528d.png",
+            rating: 4.7,
+            reviews: 3014,
+            roomType: "Kral Oda",
+            bedType: "1 extra büyük çift kişilik yatak",
+            amenities: ["Kahvaltı", "WiFi", "Spa", "Bar"],
+            price: 72,
+            originalPrice: 90,
+            nights: searchFilters.checkIn && searchFilters.checkOut ? 
+              Math.ceil((new Date(searchFilters.checkOut).getTime() - new Date(searchFilters.checkIn).getTime()) / (1000 * 60 * 60 * 24)) || 1 : 1,
+            guests: searchFilters.adults + searchFilters.children,
+            taxes: 828,
+            freeCancellation: true,
+            stars: 5
+          },
+          {
+            id: 2,
+            name: "Staycity Aparthotels Deptford Bridge",
+            location: searchFilters.location || "Ciutat Vella, Barcelona",
+            distance: "1.5 km to city center",
+            image: "/lovable-uploads/e6764045-1a5d-4f3d-80b8-d6ba711e528d.png",
+            rating: 4.8,
+            reviews: 2156,
+            roomType: "Süperior Oda",
+            bedType: "1 extra büyük çift kişilik yatak",
+            amenities: ["Kahvaltı", "WiFi", "Spa"],
+            price: 85,
+            originalPrice: 110,
+            nights: searchFilters.checkIn && searchFilters.checkOut ? 
+              Math.ceil((new Date(searchFilters.checkOut).getTime() - new Date(searchFilters.checkIn).getTime()) / (1000 * 60 * 60 * 24)) || 1 : 1,
+            guests: searchFilters.adults + searchFilters.children,
+            taxes: 728,
+            freeCancellation: true,
+            stars: 4
+          }
+        ];
+      }
       
       setHotels(hotels);
-      setTotalResults(data.total || data.count || hotels.length);
+      setTotalResults(hotels.length);
+      
     } catch (error) {
       console.error('Hotel search error:', error);
       
@@ -162,48 +202,28 @@ const SearchResults = () => {
       const fallbackHotels: Hotel[] = [
         {
           id: 1,
-          name: "The Montcalm At Brewery London City",
-          location: "Westminster Borough, London",
+          name: "Örnek Otel 1",
+          location: searchFilters.location || "İstanbul, Türkiye",
           distance: "2 km to city center",
           image: "/lovable-uploads/e6764045-1a5d-4f3d-80b8-d6ba711e528d.png",
           rating: 4.7,
           reviews: 3014,
-          roomType: "Kral Oda",
-          bedType: "1 extra büyük çift kişilik yatak",
+          roomType: "Standart Oda",
+          bedType: "1 çift kişilik yatak",
           amenities: ["Kahvaltı", "WiFi", "Spa", "Bar"],
-          price: 72,
-          originalPrice: 90,
+          price: 120,
+          originalPrice: 150,
           nights: searchFilters.checkIn && searchFilters.checkOut ? 
             Math.ceil((new Date(searchFilters.checkOut).getTime() - new Date(searchFilters.checkIn).getTime()) / (1000 * 60 * 60 * 24)) || 1 : 1,
           guests: searchFilters.adults + searchFilters.children,
-          taxes: 828,
-          freeCancellation: true,
-          stars: 5
-        },
-        {
-          id: 2,
-          name: "Staycity Aparthotels Deptford Bridge",
-          location: "Ciutat Vella, Barcelona",
-          distance: "1.5 km to city center",
-          image: "/lovable-uploads/e6764045-1a5d-4f3d-80b8-d6ba711e528d.png",
-          rating: 4.8,
-          reviews: 2156,
-          roomType: "Süperior Oda",
-          bedType: "1 extra büyük çift kişilik yatak",
-          amenities: ["Kahvaltı", "WiFi", "Spa"],
-          price: 85,
-          originalPrice: 110,
-          nights: searchFilters.checkIn && searchFilters.checkOut ? 
-            Math.ceil((new Date(searchFilters.checkOut).getTime() - new Date(searchFilters.checkIn).getTime()) / (1000 * 60 * 60 * 24)) || 1 : 1,
-          guests: searchFilters.adults + searchFilters.children,
-          taxes: 728,
+          taxes: 50,
           freeCancellation: true,
           stars: 4
         }
       ];
       
       setHotels(fallbackHotels);
-      setTotalResults(2);
+      setTotalResults(1);
     } finally {
       setLoading(false);
     }
