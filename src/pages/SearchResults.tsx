@@ -29,9 +29,9 @@ const SearchResults = () => {
       image: "/lovable-uploads/e6764045-1a5d-4f3d-80b8-d6ba711e528d.png",
       rating: 4.7,
       reviews: 3014,
-      roomType: "King Room",
-      bedType: "1 extra-large double bed",
-      amenities: ["Breakfast", "WiFi", "Spa", "Bar"],
+      roomType: "Kral Oda",
+      bedType: "1 extra büyük çift kişilik yatak",
+      amenities: ["Kahvaltı", "WiFi", "Spa", "Bar"],
       price: 72,
       originalPrice: 90,
       nights: 8,
@@ -48,9 +48,9 @@ const SearchResults = () => {
       image: "/lovable-uploads/e6764045-1a5d-4f3d-80b8-d6ba711e528d.png",
       rating: 4.8,
       reviews: 2156,
-      roomType: "Superior Room",
-      bedType: "1 extra-large double bed",
-      amenities: ["Breakfast", "WiFi", "Spa"],
+      roomType: "Süperior Oda",
+      bedType: "1 extra büyük çift kişilik yatak",
+      amenities: ["Kahvaltı", "WiFi", "Spa"],
       price: 85,
       originalPrice: 110,
       nights: 8,
@@ -62,16 +62,66 @@ const SearchResults = () => {
   ];
 
   const deals = [
-    { id: "free-cancellation", label: "Free cancellation", count: 92 },
-    { id: "reserve-now", label: "Reserve now, pay at stay", count: 45 },
-    { id: "special-offers", label: "Properties with special offers", count: 21 }
+    { id: "free-cancellation", label: "Ücretsiz iptal", count: 92 },
+    { id: "reserve-now", label: "Şimdi ayırt, konaklamada öde", count: 45 },
+    { id: "special-offers", label: "Özel teklifli tesisler", count: 21 }
   ];
 
   const popularFilters = [
-    { id: "breakfast", label: "Breakfast Included", count: 92 },
-    { id: "romantic", label: "Romantic", count: 45 },
-    { id: "airport-transfer", label: "Airport Transfer", count: 21 },
-    { id: "wifi", label: "WiFi Included", count: 78 }
+    { id: "breakfast", label: "Kahvaltı Dahil", count: 92 },
+    { id: "romantic", label: "Romantik", count: 45 },
+    { id: "airport-transfer", label: "Havaalanı Transferi", count: 21 },
+    { id: "wifi", label: "WiFi Dahil", count: 78 },
+    { id: "spa", label: "Spa", count: 64 },
+    { id: "pool", label: "Havuz", count: 112 },
+    { id: "fitness", label: "Fitness Merkezi", count: 89 },
+    { id: "parking", label: "Ücretsiz Park", count: 156 },
+    { id: "pet-friendly", label: "Evcil Hayvan Dostu", count: 33 },
+    { id: "business", label: "İş Merkezi", count: 67 },
+    { id: "family", label: "Aile Dostu", count: 134 },
+    { id: "accessible", label: "Engelli Erişimi", count: 78 }
+  ];
+
+  const starRating = [
+    { id: "5-star", label: "5 Yıldız", count: 23 },
+    { id: "4-star", label: "4 Yıldız", count: 89 },
+    { id: "3-star", label: "3 Yıldız", count: 156 },
+    { id: "2-star", label: "2 Yıldız", count: 67 },
+    { id: "1-star", label: "1 Yıldız", count: 12 }
+  ];
+
+  const propertyTypes = [
+    { id: "hotel", label: "Otel", count: 234 },
+    { id: "apartment", label: "Apart Daire", count: 156 },
+    { id: "resort", label: "Tatil Köyü", count: 67 },
+    { id: "villa", label: "Villa", count: 45 },
+    { id: "hostel", label: "Hostel", count: 89 },
+    { id: "guesthouse", label: "Pansiyon", count: 78 },
+    { id: "boutique", label: "Butik Otel", count: 34 }
+  ];
+
+  const guestRating = [
+    { id: "excellent", label: "Mükemmel (9+)", count: 45 },
+    { id: "very-good", label: "Çok İyi (8+)", count: 123 },
+    { id: "good", label: "İyi (7+)", count: 178 },
+    { id: "pleasant", label: "Hoş (6+)", count: 89 },
+    { id: "any", label: "Tümü", count: 435 }
+  ];
+
+  const distanceFilters = [
+    { id: "center-1km", label: "Şehir merkezine 1 km", count: 45 },
+    { id: "center-3km", label: "Şehir merkezine 3 km", count: 123 },
+    { id: "center-5km", label: "Şehir merkezine 5 km", count: 178 },
+    { id: "beach-500m", label: "Plaja 500 m", count: 67 },
+    { id: "airport-10km", label: "Havaalanına 10 km", count: 89 }
+  ];
+
+  const mealOptions = [
+    { id: "breakfast-included", label: "Kahvaltı Dahil", count: 156 },
+    { id: "half-board", label: "Yarım Pansiyon", count: 89 },
+    { id: "full-board", label: "Tam Pansiyon", count: 67 },
+    { id: "all-inclusive", label: "Her Şey Dahil", count: 45 },
+    { id: "no-meals", label: "Yemek Yok", count: 234 }
   ];
 
   return (
@@ -79,11 +129,11 @@ const SearchResults = () => {
       <TopBar />
       
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <h1 className="text-2xl font-bold text-gray-900">Find Your Dream Luxury Hotel</h1>
+        <div className="bg-white shadow-sm border-b">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <h1 className="text-2xl font-bold text-gray-900">Rüya Lüks Otelinizi Bulun</h1>
+          </div>
         </div>
-      </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex gap-8">
@@ -93,13 +143,59 @@ const SearchResults = () => {
               {/* Location */}
               <Card>
                 <CardContent className="p-4">
-                  <h3 className="font-semibold text-lg mb-4">Location</h3>
+                  <h3 className="font-semibold text-lg mb-4">Konum</h3>
                   <div className="relative">
                     <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
                     <Input 
-                      placeholder="Where are you going?"
+                      placeholder="Nereye gidiyorsunuz?"
                       className="pl-10"
                     />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Check-in Check-out */}
+              <Card>
+                <CardContent className="p-4">
+                  <h3 className="font-semibold text-lg mb-4">Giriş - Çıkış</h3>
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-2">
+                      <Input type="date" placeholder="Giriş" />
+                      <Input type="date" placeholder="Çıkış" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Guests */}
+              <Card>
+                <CardContent className="p-4">
+                  <h3 className="font-semibold text-lg mb-4">Misafir</h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Yetişkin</span>
+                      <div className="flex items-center gap-2">
+                        <Button variant="outline" size="sm">-</Button>
+                        <span>2</span>
+                        <Button variant="outline" size="sm">+</Button>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Çocuk (0-17 yaş)</span>
+                      <div className="flex items-center gap-2">
+                        <Button variant="outline" size="sm">-</Button>
+                        <span>1</span>
+                        <Button variant="outline" size="sm">+</Button>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Oda</span>
+                      <div className="flex items-center gap-2">
+                        <Button variant="outline" size="sm">-</Button>
+                        <span>1</span>
+                        <Button variant="outline" size="sm">+</Button>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -110,12 +206,12 @@ const SearchResults = () => {
                   <div className="bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg h-40 flex items-center justify-center mb-4">
                     <div className="text-center">
                       <MapPin className="mx-auto mb-2 text-blue-600" size={32} />
-                      <p className="text-sm text-blue-700">Interactive Map</p>
+                      <p className="text-sm text-blue-700">İnteraktif Harita</p>
                     </div>
                   </div>
                   <Button variant="outline" className="w-full">
                     <MapPin className="mr-2" size={16} />
-                    Show on map
+                    Haritada göster
                   </Button>
                 </CardContent>
               </Card>
@@ -123,15 +219,139 @@ const SearchResults = () => {
               {/* Search by property name */}
               <Card>
                 <CardContent className="p-4">
-                  <h3 className="font-semibold mb-4">Search by property name</h3>
-                  <Input placeholder="e.g. Best Western" />
+                  <h3 className="font-semibold mb-4">Tesis adına göre ara</h3>
+                  <Input placeholder="örn. Hilton, Marriott" />
+                </CardContent>
+              </Card>
+
+              {/* Price Range */}
+              <Card>
+                <CardContent className="p-4">
+                  <h3 className="font-semibold mb-4">Fiyat Aralığı</h3>
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-2">
+                      <Input placeholder="Min fiyat" type="number" />
+                      <Input placeholder="Max fiyat" type="number" />
+                    </div>
+                    <div className="text-xs text-gray-500">Gecelik fiyat (vergi hariç)</div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Star Rating */}
+              <Card>
+                <CardContent className="p-4">
+                  <h3 className="font-semibold mb-4">Yıldız</h3>
+                  <div className="space-y-3">
+                    {starRating.map((rating) => (
+                      <div key={rating.id} className="flex items-center space-x-2">
+                        <Checkbox 
+                          id={rating.id}
+                          checked={selectedFilters.includes(rating.id)}
+                          onCheckedChange={() => toggleFilter(rating.id)}
+                        />
+                        <label htmlFor={rating.id} className="text-sm flex-1">
+                          {rating.label}
+                        </label>
+                        <span className="text-xs text-gray-500">{rating.count}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Property Type */}
+              <Card>
+                <CardContent className="p-4">
+                  <h3 className="font-semibold mb-4">Tesis Türü</h3>
+                  <div className="space-y-3">
+                    {propertyTypes.map((type) => (
+                      <div key={type.id} className="flex items-center space-x-2">
+                        <Checkbox 
+                          id={type.id}
+                          checked={selectedFilters.includes(type.id)}
+                          onCheckedChange={() => toggleFilter(type.id)}
+                        />
+                        <label htmlFor={type.id} className="text-sm flex-1">
+                          {type.label}
+                        </label>
+                        <span className="text-xs text-gray-500">{type.count}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Guest Rating */}
+              <Card>
+                <CardContent className="p-4">
+                  <h3 className="font-semibold mb-4">Misafir Puanı</h3>
+                  <div className="space-y-3">
+                    {guestRating.map((rating) => (
+                      <div key={rating.id} className="flex items-center space-x-2">
+                        <Checkbox 
+                          id={rating.id}
+                          checked={selectedFilters.includes(rating.id)}
+                          onCheckedChange={() => toggleFilter(rating.id)}
+                        />
+                        <label htmlFor={rating.id} className="text-sm flex-1">
+                          {rating.label}
+                        </label>
+                        <span className="text-xs text-gray-500">{rating.count}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Distance */}
+              <Card>
+                <CardContent className="p-4">
+                  <h3 className="font-semibold mb-4">Mesafe</h3>
+                  <div className="space-y-3">
+                    {distanceFilters.map((distance) => (
+                      <div key={distance.id} className="flex items-center space-x-2">
+                        <Checkbox 
+                          id={distance.id}
+                          checked={selectedFilters.includes(distance.id)}
+                          onCheckedChange={() => toggleFilter(distance.id)}
+                        />
+                        <label htmlFor={distance.id} className="text-sm flex-1">
+                          {distance.label}
+                        </label>
+                        <span className="text-xs text-gray-500">{distance.count}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Meal Options */}
+              <Card>
+                <CardContent className="p-4">
+                  <h3 className="font-semibold mb-4">Yemek Seçenekleri</h3>
+                  <div className="space-y-3">
+                    {mealOptions.map((meal) => (
+                      <div key={meal.id} className="flex items-center space-x-2">
+                        <Checkbox 
+                          id={meal.id}
+                          checked={selectedFilters.includes(meal.id)}
+                          onCheckedChange={() => toggleFilter(meal.id)}
+                        />
+                        <label htmlFor={meal.id} className="text-sm flex-1">
+                          {meal.label}
+                        </label>
+                        <span className="text-xs text-gray-500">{meal.count}</span>
+                      </div>
+                    ))}
+                  </div>
                 </CardContent>
               </Card>
 
               {/* Deals */}
               <Card>
                 <CardContent className="p-4">
-                  <h3 className="font-semibold mb-4">Deals</h3>
+                  <h3 className="font-semibold mb-4">Fırsatlar</h3>
                   <div className="space-y-3">
                     {deals.map((deal) => (
                       <div key={deal.id} className="flex items-center space-x-2">
@@ -153,7 +373,7 @@ const SearchResults = () => {
               {/* Popular Filters */}
               <Card>
                 <CardContent className="p-4">
-                  <h3 className="font-semibold mb-4">Popular Filters</h3>
+                  <h3 className="font-semibold mb-4">Popüler Filtreler</h3>
                   <div className="space-y-3">
                     {popularFilters.map((filter) => (
                       <div key={filter.id} className="flex items-center space-x-2">
@@ -179,19 +399,19 @@ const SearchResults = () => {
             {/* Results Header */}
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-xl font-semibold">3,269 properties in Europe</h2>
-                <p className="text-gray-600 mt-1">Top picks for your search</p>
+                <h2 className="text-xl font-semibold">Avrupa'da 3,269 tesis</h2>
+                <p className="text-gray-600 mt-1">Aramanız için en iyi seçenekler</p>
               </div>
               <Select defaultValue="recommended">
                 <SelectTrigger className="w-48">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="recommended">Top picks for your search</SelectItem>
-                  <SelectItem value="price-low">Price (lowest first)</SelectItem>
-                  <SelectItem value="price-high">Price (highest first)</SelectItem>
-                  <SelectItem value="rating">Guest rating</SelectItem>
-                  <SelectItem value="distance">Distance from center</SelectItem>
+                  <SelectItem value="recommended">Aramanız için en iyiler</SelectItem>
+                  <SelectItem value="price-low">Fiyat (düşükten yükseğe)</SelectItem>
+                  <SelectItem value="price-high">Fiyat (yüksekten düşüğe)</SelectItem>
+                  <SelectItem value="rating">Misafir puanı</SelectItem>
+                  <SelectItem value="distance">Merkeze uzaklık</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -245,12 +465,12 @@ const SearchResults = () => {
 
                             {hotel.freeCancellation && (
                               <div className="mb-3">
-                                <Badge variant="secondary" className="bg-green-100 text-green-800">
-                                  Free cancellation
-                                </Badge>
-                                <p className="text-sm text-gray-600 mt-1">
-                                  You can cancel later, so lock in this great price today.
-                                </p>
+                              <Badge variant="secondary" className="bg-green-100 text-green-800">
+                                Ücretsiz iptal
+                              </Badge>
+                              <p className="text-sm text-gray-600 mt-1">
+                                Daha sonra iptal edebilirsiniz, bu harika fiyatı bugün garantileyin.
+                              </p>
                               </div>
                             )}
 
@@ -267,17 +487,17 @@ const SearchResults = () => {
                           <div className="text-right ml-6">
                             <div className="mb-4">
                               <div className="flex items-center justify-end mb-1">
-                                <span className="text-sm font-medium mr-2">Exceptional</span>
+                                <span className="text-sm font-medium mr-2">Mükemmel</span>
                                 <div className="bg-blue-600 text-white px-2 py-1 rounded text-sm font-bold">
                                   {hotel.rating}
                                 </div>
                               </div>
-                              <p className="text-xs text-gray-600">{hotel.reviews.toLocaleString()} reviews</p>
+                              <p className="text-xs text-gray-600">{hotel.reviews.toLocaleString()} değerlendirme</p>
                             </div>
 
                             <div className="text-right">
                               <p className="text-sm text-gray-600 mb-1">
-                                {hotel.nights} nights, {hotel.guests} adult
+                                {hotel.nights} gece, {hotel.guests} yetişkin
                               </p>
                               <div className="mb-2">
                                 <span className="text-2xl font-bold text-gray-900">US${hotel.price}</span>
@@ -288,10 +508,10 @@ const SearchResults = () => {
                                 )}
                               </div>
                               <p className="text-xs text-gray-600 mb-3">
-                                +US${hotel.taxes} taxes and charges
+                                +US${hotel.taxes} vergi ve ücretler
                               </p>
                               <Button className="bg-rose-600 hover:bg-rose-700 text-white">
-                                See Availability
+                                Müsaitlik Durumu
                                 <ArrowRight size={16} className="ml-2" />
                               </Button>
                             </div>
