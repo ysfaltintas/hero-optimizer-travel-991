@@ -100,13 +100,6 @@ const HeroSection = () => {
 
           {/* Search Form */}
           <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl p-8 max-w-6xl mx-auto border border-white/20">
-            {/* Hotel Tab - Active */}
-            <div className="flex justify-center mb-10">
-              <div className="bg-blue-600 text-white px-8 py-3 rounded-full font-semibold text-lg shadow-lg">
-                Hotel
-              </div>
-            </div>
-
             {/* Search Fields */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div className="md:col-span-1">
