@@ -417,66 +417,67 @@ const SearchResults = () => {
             </div>
 
             {/* Hotel Cards */}
-            <div className="space-y-6">
+            <div className="space-y-4">
               {hotels.map((hotel) => (
-                <Card key={hotel.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                <Card key={hotel.id} className="overflow-hidden hover:shadow-md transition-shadow">
                   <CardContent className="p-0">
-                    <div className="flex">
+                    <div className="flex h-48">
                       {/* Hotel Image */}
-                      <div className="w-80 relative">
+                      <div className="w-64 relative">
                         <img 
                           src={hotel.image} 
                           alt={hotel.name}
-                          className="w-full h-64 object-cover"
+                          className="w-full h-48 object-cover rounded-l-lg"
                         />
                         <Button 
                           variant="ghost" 
                           size="sm"
-                          className="absolute top-4 right-4 bg-white/90 hover:bg-white"
+                          className="absolute top-3 right-3 bg-white/90 hover:bg-white w-8 h-8 p-0"
                         >
-                          <Heart size={16} />
+                          <Heart size={14} />
                         </Button>
                       </div>
 
                       {/* Hotel Details */}
-                      <div className="flex-1 p-6">
-                        <div className="flex justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <h3 className="text-xl font-semibold text-gray-900">{hotel.name}</h3>
-                              <div className="flex">
-                                {[...Array(hotel.stars)].map((_, i) => (
-                                  <Star key={i} size={14} className="fill-yellow-400 text-yellow-400" />
-                                ))}
+                      <div className="flex-1 p-4">
+                        <div className="flex justify-between h-full">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start gap-2 mb-2">
+                              <div className="flex-1 min-w-0">
+                                <h3 className="text-lg font-semibold text-gray-900 truncate">{hotel.name}</h3>
+                                <div className="flex items-center mt-1">
+                                  {[...Array(hotel.stars)].map((_, i) => (
+                                    <Star key={i} size={12} className="fill-yellow-400 text-yellow-400" />
+                                  ))}
+                                </div>
                               </div>
                             </div>
                             
                             <div className="flex items-center text-gray-600 mb-2">
-                              <MapPin size={14} className="mr-1" />
-                              <span className="text-sm">{hotel.location}</span>
-                              <span className="mx-2">•</span>
-                              <span className="text-sm">{hotel.distance}</span>
+                              <MapPin size={12} className="mr-1 flex-shrink-0" />
+                              <span className="text-sm truncate">{hotel.location}</span>
                             </div>
 
-                            <div className="mb-3">
-                              <p className="font-medium text-gray-900">{hotel.roomType}</p>
-                              <p className="text-sm text-gray-600">{hotel.bedType}</p>
+                            <div className="text-xs text-gray-500 mb-2">
+                              {hotel.distance}
+                            </div>
+
+                            <div className="mb-2">
+                              <p className="text-sm font-medium text-gray-900">{hotel.roomType}</p>
+                              <p className="text-xs text-gray-600">{hotel.bedType}</p>
                             </div>
 
                             {hotel.freeCancellation && (
-                              <div className="mb-3">
-                              <Badge variant="secondary" className="bg-green-100 text-green-800">
-                                Ücretsiz iptal
-                              </Badge>
-                              <p className="text-sm text-gray-600 mt-1">
-                                Daha sonra iptal edebilirsiniz, bu harika fiyatı bugün garantileyin.
-                              </p>
+                              <div className="mb-2">
+                                <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs px-2 py-0.5">
+                                  Ücretsiz iptal
+                                </Badge>
                               </div>
                             )}
 
-                            <div className="flex gap-2 mb-4">
-                              {hotel.amenities.map((amenity) => (
-                                <Badge key={amenity} variant="outline" className="text-xs">
+                            <div className="flex gap-1 flex-wrap">
+                              {hotel.amenities.slice(0, 4).map((amenity) => (
+                                <Badge key={amenity} variant="outline" className="text-xs px-1.5 py-0.5">
                                   {amenity}
                                 </Badge>
                               ))}
@@ -484,35 +485,35 @@ const SearchResults = () => {
                           </div>
 
                           {/* Rating and Price */}
-                          <div className="text-right ml-6">
-                            <div className="mb-4">
+                          <div className="text-right ml-4 flex flex-col justify-between">
+                            <div>
                               <div className="flex items-center justify-end mb-1">
-                                <span className="text-sm font-medium mr-2">Mükemmel</span>
-                                <div className="bg-blue-600 text-white px-2 py-1 rounded text-sm font-bold">
+                                <span className="text-xs font-medium mr-2">Mükemmel</span>
+                                <div className="bg-blue-600 text-white px-1.5 py-0.5 rounded text-xs font-bold">
                                   {hotel.rating}
                                 </div>
                               </div>
                               <p className="text-xs text-gray-600">{hotel.reviews.toLocaleString()} değerlendirme</p>
                             </div>
 
-                            <div className="text-right">
-                              <p className="text-sm text-gray-600 mb-1">
+                            <div className="text-right mt-4">
+                              <p className="text-xs text-gray-600 mb-1">
                                 {hotel.nights} gece, {hotel.guests} yetişkin
                               </p>
-                              <div className="mb-2">
-                                <span className="text-2xl font-bold text-gray-900">US${hotel.price}</span>
+                              <div className="mb-1">
+                                <span className="text-xl font-bold text-gray-900">US${hotel.price}</span>
                                 {hotel.originalPrice > hotel.price && (
-                                  <span className="text-sm text-gray-500 line-through ml-2">
+                                  <span className="text-xs text-gray-500 line-through ml-1">
                                     US${hotel.originalPrice}
                                   </span>
                                 )}
                               </div>
-                              <p className="text-xs text-gray-600 mb-3">
+                              <p className="text-xs text-gray-600 mb-2">
                                 +US${hotel.taxes} vergi ve ücretler
                               </p>
-                              <Button className="bg-rose-600 hover:bg-rose-700 text-white">
+                              <Button size="sm" className="bg-rose-600 hover:bg-rose-700 text-white text-xs px-3 py-1.5">
                                 Müsaitlik Durumu
-                                <ArrowRight size={16} className="ml-2" />
+                                <ArrowRight size={12} className="ml-1" />
                               </Button>
                             </div>
                           </div>
