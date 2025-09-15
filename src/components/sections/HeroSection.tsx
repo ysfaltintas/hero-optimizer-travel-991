@@ -45,32 +45,32 @@ const HeroSection = () => {
           </div>
 
           {/* Search Form */}
-          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-5xl mx-auto">
+          <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl p-8 max-w-6xl mx-auto border border-white/20">
             {/* Hotel Tab - Active */}
-            <div className="flex justify-center mb-8">
-              <div className="bg-blue-600 text-white px-6 py-2 rounded-full font-medium">
+            <div className="flex justify-center mb-10">
+              <div className="bg-blue-600 text-white px-8 py-3 rounded-full font-semibold text-lg shadow-lg">
                 Hotel
               </div>
             </div>
 
             {/* Search Fields */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="md:col-span-1">
+                <label className="block text-sm font-semibold text-gray-800 mb-3">
                   Location
                 </label>
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                  <MapPin className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500" size={20} />
                   <input 
                     type="text" 
                     placeholder="Where are you going?" 
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none"
+                    className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white text-gray-900 placeholder-gray-500 font-medium"
                   />
                 </div>
               </div>
               
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="md:col-span-1">
+                <label className="block text-sm font-semibold text-gray-800 mb-3">
                   Check in - Check out
                 </label>
                 <Popover>
@@ -78,22 +78,24 @@ const HeroSection = () => {
                     <Button
                       variant="outline"
                       className={cn(
-                        "w-full justify-start text-left font-normal py-3 h-auto border-gray-300 hover:bg-gray-50",
+                        "w-full justify-start text-left font-medium py-4 h-auto border-gray-200 hover:bg-gray-50 bg-white text-gray-900",
                         !dateRange && "text-gray-500"
                       )}
                     >
-                      <CalendarIcon className="mr-2 text-gray-400" size={20} />
-                      {dateRange?.from ? (
-                        dateRange.to ? (
-                          <>
-                            {format(dateRange.from, "MMM dd")} - {format(dateRange.to, "MMM dd")}
-                          </>
+                      <CalendarIcon className="mr-3 text-gray-500" size={20} />
+                      <span className="text-sm">
+                        {dateRange?.from ? (
+                          dateRange.to ? (
+                            <>
+                              {format(dateRange.from, "MMM dd")} - {format(dateRange.to, "MMM dd")}
+                            </>
+                          ) : (
+                            format(dateRange.from, "MMM dd")
+                          )
                         ) : (
-                          format(dateRange.from, "MMM dd")
-                        )
-                      ) : (
-                        <span>September 05 – October 14</span>
-                      )}
+                          "September 05 – October 14"
+                        )}
+                      </span>
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -110,25 +112,27 @@ const HeroSection = () => {
                 </Popover>
               </div>
               
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="md:col-span-1">
+                <label className="block text-sm font-semibold text-gray-800 mb-3">
                   Guest
                 </label>
                 <Popover open={showGuestPopover} onOpenChange={setShowGuestPopover}>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-full justify-start text-left font-normal py-3 h-auto border-gray-300 hover:bg-gray-50"
+                      className="w-full justify-start text-left font-medium py-4 h-auto border-gray-200 hover:bg-gray-50 bg-white text-gray-900"
                     >
-                      <Users className="mr-2 text-gray-400" size={20} />
-                      {guests.adults} adults - {guests.children} children - {guests.rooms} room
+                      <Users className="mr-3 text-gray-500" size={20} />
+                      <span className="text-sm">
+                        {guests.adults} adults - {guests.children} children - {guests.rooms} room
+                      </span>
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-80 p-6" align="start">
                     <div className="space-y-6">
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="font-medium">Adults</div>
+                          <div className="font-semibold text-gray-900">Adults</div>
                         </div>
                         <div className="flex items-center space-x-3">
                           <Button
@@ -139,7 +143,7 @@ const HeroSection = () => {
                           >
                             <Minus size={16} />
                           </Button>
-                          <span className="w-8 text-center">{guests.adults}</span>
+                          <span className="w-8 text-center font-semibold">{guests.adults}</span>
                           <Button
                             variant="outline"
                             size="sm"
@@ -152,7 +156,7 @@ const HeroSection = () => {
                       
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="font-medium">Children</div>
+                          <div className="font-semibold text-gray-900">Children</div>
                           <div className="text-sm text-gray-500">Ages 0 - 17</div>
                         </div>
                         <div className="flex items-center space-x-3">
@@ -164,7 +168,7 @@ const HeroSection = () => {
                           >
                             <Minus size={16} />
                           </Button>
-                          <span className="w-8 text-center">{guests.children}</span>
+                          <span className="w-8 text-center font-semibold">{guests.children}</span>
                           <Button
                             variant="outline"
                             size="sm"
@@ -177,7 +181,7 @@ const HeroSection = () => {
                       
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="font-medium">Rooms</div>
+                          <div className="font-semibold text-gray-900">Rooms</div>
                         </div>
                         <div className="flex items-center space-x-3">
                           <Button
@@ -188,7 +192,7 @@ const HeroSection = () => {
                           >
                             <Minus size={16} />
                           </Button>
-                          <span className="w-8 text-center">{guests.rooms}</span>
+                          <span className="w-8 text-center font-semibold">{guests.rooms}</span>
                           <Button
                             variant="outline"
                             size="sm"
@@ -203,8 +207,8 @@ const HeroSection = () => {
                 </Popover>
               </div>
               
-              <div className="flex items-end">
-                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg">
+              <div className="flex items-end md:col-span-1">
+                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-200">
                   <Search className="mr-2" size={20} />
                   Search
                 </Button>
