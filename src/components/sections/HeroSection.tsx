@@ -1,9 +1,15 @@
 import { useState } from "react";
+import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { MapPin, Calendar, Users, Search } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { MapPin, Calendar as CalendarIcon, Users, Search } from "lucide-react";
+import { cn } from "@/lib/utils";
+import type { DateRange } from "react-day-picker";
 
 const HeroSection = () => {
   const [activeTab, setActiveTab] = useState("Stays");
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const tabs = ["Stays", "Experiences", "Cars", "Flights"];
 
   return (
@@ -65,14 +71,41 @@ const HeroSection = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-3">
                     Check in - Check out
                   </label>
-                  <div className="relative">
-                    <Calendar className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={22} />
-                    <input 
-                      type="text" 
-                      placeholder="Feb 06 - Feb 23" 
-                      className="w-full pl-12 pr-4 py-4 text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
-                    />
-                  </div>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal h-[60px] text-lg border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent bg-white hover:bg-gray-50",
+                          !dateRange && "text-gray-500"
+                        )}
+                      >
+                        <CalendarIcon className="mr-3 text-gray-400" size={22} />
+                        {dateRange?.from ? (
+                          dateRange.to ? (
+                            <>
+                              {format(dateRange.from, "MMM dd")} - {format(dateRange.to, "MMM dd")}
+                            </>
+                          ) : (
+                            format(dateRange.from, "MMM dd")
+                          )
+                        ) : (
+                          <span>Feb 06 - Feb 23</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        initialFocus
+                        mode="range"
+                        defaultMonth={dateRange?.from}
+                        selected={dateRange}
+                        onSelect={setDateRange}
+                        numberOfMonths={2}
+                        className={cn("p-3 pointer-events-auto")}
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
                 
                 <div>
