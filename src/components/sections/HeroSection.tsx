@@ -3,14 +3,27 @@ import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { MapPin, Calendar as CalendarIcon, Users, Search, Plus, Minus } from "lucide-react";
+import { MapPin, Calendar as CalendarIcon, Users, Search, Plus, Minus, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { DateRange } from "react-day-picker";
+
+interface Hotel {
+  id: string;
+  name: string;
+}
+
+interface SearchResults {
+  hotels: Hotel[];
+}
 
 const HeroSection = () => {
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [guests, setGuests] = useState({ adults: 2, children: 1, rooms: 1 });
   const [showGuestPopover, setShowGuestPopover] = useState(false);
+  const [location, setLocation] = useState("");
+  const [searchResults, setSearchResults] = useState<SearchResults | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const updateGuests = (type: 'adults' | 'children' | 'rooms', operation: 'add' | 'subtract') => {
     setGuests(prev => ({
@@ -19,6 +32,47 @@ const HeroSection = () => {
         ? prev[type] + 1 
         : Math.max(type === 'rooms' ? 1 : 0, prev[type] - 1)
     }));
+  };
+
+  const handleSearch = async () => {
+    if (!location || !dateRange?.from || !dateRange?.to) {
+      setError("Lütfen tüm alanları doldurun");
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const apiBase = import.meta.env.VITE_API_BASE || 'https://api.example.com';
+      const apiKey = import.meta.env.VITE_API_KEY || 'your-api-key';
+      
+      const params = new URLSearchParams({
+        city: location,
+        checkin: format(dateRange.from, 'yyyy-MM-dd'),
+        checkout: format(dateRange.to, 'yyyy-MM-dd'),
+        guests: (guests.adults + guests.children).toString()
+      });
+
+      const response = await fetch(`${apiBase}/hotels?${params}`, {
+        method: 'GET',
+        headers: {
+          'x-api-key': apiKey,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`API hatası: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setSearchResults(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Bir hata oluştu');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -64,6 +118,8 @@ const HeroSection = () => {
                   <input 
                     type="text" 
                     placeholder="Where are you going?" 
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
                     className="w-full pl-12 pr-4 py-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-white text-gray-900 placeholder-gray-500 font-medium"
                   />
                 </div>
@@ -208,13 +264,47 @@ const HeroSection = () => {
               </div>
               
               <div className="flex items-end md:col-span-1">
-                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-200">
-                  <Search className="mr-2" size={20} />
-                  Search
+                <Button 
+                  onClick={handleSearch}
+                  disabled={isLoading}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-200"
+                >
+                  {isLoading ? (
+                    <Loader2 className="mr-2 animate-spin" size={20} />
+                  ) : (
+                    <Search className="mr-2" size={20} />
+                  )}
+                  {isLoading ? 'Aranıyor...' : 'Search'}
                 </Button>
-              </div>
             </div>
           </div>
+          
+          {/* Error Display */}
+          {error && (
+            <div className="mt-6 p-4 bg-red-100 border border-red-300 rounded-xl text-red-700">
+              {error}
+            </div>
+          )}
+          
+          {/* Search Results */}
+          {searchResults && (
+            <div className="mt-8 bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl p-8 border border-white/20">
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">Arama Sonuçları</h3>
+              {searchResults.hotels && searchResults.hotels.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {searchResults.hotels.map((hotel) => (
+                    <div key={hotel.id} className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                      <h4 className="font-semibold text-gray-900 text-lg">{hotel.name}</h4>
+                      <p className="text-gray-600 text-sm mt-1">ID: {hotel.id}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-600">Sonuç bulunamadı.</p>
+              )}
+            </div>
+          )}
+        </div>
         </div>
       </div>
     </section>
