@@ -78,27 +78,27 @@ const HeroSection = () => {
                     <Button
                       variant="outline"
                       className={cn(
-                        "w-full justify-start text-left font-medium py-4 h-auto border-gray-200 hover:bg-gray-50 bg-white text-gray-900",
+                        "w-full justify-start text-left font-medium py-4 h-auto border-gray-200 hover:bg-gray-50 bg-white text-gray-900 overflow-hidden",
                         !dateRange && "text-gray-500"
                       )}
                     >
-                      <CalendarIcon className="mr-3 text-gray-500" size={20} />
-                      <span className="text-sm">
+                      <CalendarIcon className="mr-2 flex-shrink-0 text-gray-500" size={18} />
+                      <span className="text-xs truncate">
                         {dateRange?.from ? (
                           dateRange.to ? (
                             <>
-                              {format(dateRange.from, "MMM dd")} - {format(dateRange.to, "MMM dd")}
+                              {format(dateRange.from, "dd MMM")} - {format(dateRange.to, "dd MMM")}
                             </>
                           ) : (
-                            format(dateRange.from, "MMM dd")
+                            format(dateRange.from, "dd MMM")
                           )
                         ) : (
-                          "September 05 – October 14"
+                          "05 Sep – 14 Oct"
                         )}
                       </span>
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
+                  <PopoverContent className="w-auto p-0 bg-white shadow-xl border z-50" align="start">
                     <Calendar
                       initialFocus
                       mode="range"
@@ -120,15 +120,15 @@ const HeroSection = () => {
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
-                      className="w-full justify-start text-left font-medium py-4 h-auto border-gray-200 hover:bg-gray-50 bg-white text-gray-900"
+                      className="w-full justify-start text-left font-medium py-4 h-auto border-gray-200 hover:bg-gray-50 bg-white text-gray-900 overflow-hidden"
                     >
-                      <Users className="mr-3 text-gray-500" size={20} />
-                      <span className="text-sm">
+                      <Users className="mr-2 flex-shrink-0 text-gray-500" size={18} />
+                      <span className="text-xs truncate">
                         {guests.adults} adults - {guests.children} children - {guests.rooms} room
                       </span>
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-80 p-6" align="start">
+                  <PopoverContent className="w-80 p-6 bg-white shadow-xl border z-50" align="start">
                     <div className="space-y-6">
                       <div className="flex items-center justify-between">
                         <div>
