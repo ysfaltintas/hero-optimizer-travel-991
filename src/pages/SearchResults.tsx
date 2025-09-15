@@ -1,65 +1,181 @@
-import { useState } from "react";
-import { MapPin, Star, Heart, ArrowRight } from "lucide-react";
+import { useState, useEffect } from "react";
+import { MapPin, Star, Heart, ArrowRight, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useSearchParams } from "react-router-dom";
 import TopBar from "@/components/layout/TopBar";
 
-const SearchResults = () => {
-  const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+interface Hotel {
+  id: number;
+  name: string;
+  location: string;
+  distance: string;
+  image: string;
+  rating: number;
+  reviews: number;
+  roomType: string;
+  bedType: string;
+  amenities: string[];
+  price: number;
+  originalPrice?: number;
+  nights: number;
+  guests: number;
+  taxes: number;
+  freeCancellation: boolean;
+  stars: number;
+}
 
-  const toggleFilter = (filter: string) => {
-    setSelectedFilters(prev => 
-      prev.includes(filter) 
-        ? prev.filter(f => f !== filter)
-        : [...prev, filter]
-    );
+interface SearchFilters {
+  location?: string;
+  checkIn?: string;
+  checkOut?: string;
+  adults: number;
+  children: number;
+  rooms: number;
+  minPrice?: number;
+  maxPrice?: number;
+  starRating: string[];
+  propertyTypes: string[];
+  guestRating: string[];
+  distance: string[];
+  meals: string[];
+  deals: string[];
+  amenities: string[];
+  sortBy: string;
+}
+
+const SearchResults = () => {
+  const [searchParams] = useSearchParams();
+  const [hotels, setHotels] = useState<Hotel[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [totalResults, setTotalResults] = useState(0);
+  
+  // Filter states
+  const [filters, setFilters] = useState<SearchFilters>({
+    location: searchParams.get('location') || '',
+    checkIn: searchParams.get('checkIn') || '',
+    checkOut: searchParams.get('checkOut') || '',
+    adults: parseInt(searchParams.get('adults') || '2'),
+    children: parseInt(searchParams.get('children') || '0'),
+    rooms: parseInt(searchParams.get('rooms') || '1'),
+    starRating: [],
+    propertyTypes: [],
+    guestRating: [],
+    distance: [],
+    meals: [],
+    deals: [],
+    amenities: [],
+    sortBy: 'recommended'
+  });
+
+  // API call function (mock için şimdilik)
+  const searchHotels = async (searchFilters: SearchFilters) => {
+    setLoading(true);
+    try {
+      // Bu gerçek API çağrısı olacak
+      // const response = await fetch('/api/hotels/search', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify(searchFilters)
+      // });
+      // const data = await response.json();
+      
+      // Mock data - gerçek API'dan gelecek
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Loading simulation
+      
+      const mockHotels: Hotel[] = [
+        {
+          id: 1,
+          name: "The Montcalm At Brewery London City",
+          location: "Westminster Borough, London",
+          distance: "2 km to city center",
+          image: "/lovable-uploads/e6764045-1a5d-4f3d-80b8-d6ba711e528d.png",
+          rating: 4.7,
+          reviews: 3014,
+          roomType: "Kral Oda",
+          bedType: "1 extra büyük çift kişilik yatak",
+          amenities: ["Kahvaltı", "WiFi", "Spa", "Bar"],
+          price: 72,
+          originalPrice: 90,
+          nights: 8,
+          guests: 2,
+          taxes: 828,
+          freeCancellation: true,
+          stars: 5
+        },
+        {
+          id: 2,
+          name: "Staycity Aparthotels Deptford Bridge",
+          location: "Ciutat Vella, Barcelona",
+          distance: "1.5 km to city center",
+          image: "/lovable-uploads/e6764045-1a5d-4f3d-80b8-d6ba711e528d.png",
+          rating: 4.8,
+          reviews: 2156,
+          roomType: "Süperior Oda",
+          bedType: "1 extra büyük çift kişilik yatak",
+          amenities: ["Kahvaltı", "WiFi", "Spa"],
+          price: 85,
+          originalPrice: 110,
+          nights: 8,
+          guests: 2,
+          taxes: 728,
+          freeCancellation: true,
+          stars: 4
+        }
+      ];
+      
+      setHotels(mockHotels);
+      setTotalResults(3269); // Mock total
+    } catch (error) {
+      console.error('Hotel search error:', error);
+      setHotels([]);
+      setTotalResults(0);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Mock data - bu gerçek API'dan gelecek
-  const hotels = [
-    {
-      id: 1,
-      name: "The Montcalm At Brewery London City",
-      location: "Westminster Borough, London",
-      distance: "2 km to city center",
-      image: "/lovable-uploads/e6764045-1a5d-4f3d-80b8-d6ba711e528d.png",
-      rating: 4.7,
-      reviews: 3014,
-      roomType: "Kral Oda",
-      bedType: "1 extra büyük çift kişilik yatak",
-      amenities: ["Kahvaltı", "WiFi", "Spa", "Bar"],
-      price: 72,
-      originalPrice: 90,
-      nights: 8,
-      guests: 2,
-      taxes: 828,
-      freeCancellation: true,
-      stars: 5
-    },
-    {
-      id: 2,
-      name: "Staycity Aparthotels Deptford Bridge",
-      location: "Ciutat Vella, Barcelona",
-      distance: "1.5 km to city center",
-      image: "/lovable-uploads/e6764045-1a5d-4f3d-80b8-d6ba711e528d.png",
-      rating: 4.8,
-      reviews: 2156,
-      roomType: "Süperior Oda",
-      bedType: "1 extra büyük çift kişilik yatak",
-      amenities: ["Kahvaltı", "WiFi", "Spa"],
-      price: 85,
-      originalPrice: 110,
-      nights: 8,
-      guests: 2,
-      taxes: 728,
-      freeCancellation: true,
-      stars: 4
-    }
-  ];
+  // Initial search and when filters change
+  useEffect(() => {
+    searchHotels(filters);
+  }, [filters]);
+
+  // Filter toggle functions
+  const toggleArrayFilter = (filterType: keyof SearchFilters, value: string) => {
+    setFilters(prev => {
+      const currentArray = prev[filterType] as string[];
+      const newArray = currentArray.includes(value)
+        ? currentArray.filter(item => item !== value)
+        : [...currentArray, value];
+      
+      return {
+        ...prev,
+        [filterType]: newArray
+      };
+    });
+  };
+
+  const updateFilter = (filterType: keyof SearchFilters, value: any) => {
+    setFilters(prev => ({
+      ...prev,
+      [filterType]: value
+    }));
+  };
+
+  const updateGuestCount = (type: 'adults' | 'children' | 'rooms', increment: boolean) => {
+    setFilters(prev => {
+      const currentValue = prev[type];
+      const newValue = increment ? currentValue + 1 : Math.max(type === 'adults' ? 1 : 0, currentValue - 1);
+      return {
+        ...prev,
+        [type]: newValue
+      };
+    });
+  };
 
   const deals = [
     { id: "free-cancellation", label: "Ücretsiz iptal", count: 92 },
@@ -149,6 +265,8 @@ const SearchResults = () => {
                     <Input 
                       placeholder="Nereye gidiyorsunuz?"
                       className="pl-10"
+                      value={filters.location}
+                      onChange={(e) => updateFilter('location', e.target.value)}
                     />
                   </div>
                 </CardContent>
@@ -160,8 +278,18 @@ const SearchResults = () => {
                   <h3 className="font-semibold text-lg mb-4">Giriş - Çıkış</h3>
                   <div className="space-y-3">
                     <div className="grid grid-cols-2 gap-2">
-                      <Input type="date" placeholder="Giriş" />
-                      <Input type="date" placeholder="Çıkış" />
+                      <Input 
+                        type="date" 
+                        placeholder="Giriş" 
+                        value={filters.checkIn}
+                        onChange={(e) => updateFilter('checkIn', e.target.value)}
+                      />
+                      <Input 
+                        type="date" 
+                        placeholder="Çıkış"
+                        value={filters.checkOut}
+                        onChange={(e) => updateFilter('checkOut', e.target.value)}
+                      />
                     </div>
                   </div>
                 </CardContent>
@@ -175,25 +303,49 @@ const SearchResults = () => {
                     <div className="flex justify-between items-center">
                       <span className="text-sm">Yetişkin</span>
                       <div className="flex items-center gap-2">
-                        <Button variant="outline" size="sm">-</Button>
-                        <span>2</span>
-                        <Button variant="outline" size="sm">+</Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => updateGuestCount('adults', false)}
+                        >-</Button>
+                        <span>{filters.adults}</span>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => updateGuestCount('adults', true)}
+                        >+</Button>
                       </div>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm">Çocuk (0-17 yaş)</span>
                       <div className="flex items-center gap-2">
-                        <Button variant="outline" size="sm">-</Button>
-                        <span>1</span>
-                        <Button variant="outline" size="sm">+</Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => updateGuestCount('children', false)}
+                        >-</Button>
+                        <span>{filters.children}</span>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => updateGuestCount('children', true)}
+                        >+</Button>
                       </div>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm">Oda</span>
                       <div className="flex items-center gap-2">
-                        <Button variant="outline" size="sm">-</Button>
-                        <span>1</span>
-                        <Button variant="outline" size="sm">+</Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => updateGuestCount('rooms', false)}
+                        >-</Button>
+                        <span>{filters.rooms}</span>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => updateGuestCount('rooms', true)}
+                        >+</Button>
                       </div>
                     </div>
                   </div>
@@ -247,8 +399,8 @@ const SearchResults = () => {
                       <div key={rating.id} className="flex items-center space-x-2">
                         <Checkbox 
                           id={rating.id}
-                          checked={selectedFilters.includes(rating.id)}
-                          onCheckedChange={() => toggleFilter(rating.id)}
+                          checked={filters.starRating.includes(rating.id)}
+                          onCheckedChange={() => toggleArrayFilter('starRating', rating.id)}
                         />
                         <label htmlFor={rating.id} className="text-sm flex-1">
                           {rating.label}
@@ -269,8 +421,8 @@ const SearchResults = () => {
                       <div key={type.id} className="flex items-center space-x-2">
                         <Checkbox 
                           id={type.id}
-                          checked={selectedFilters.includes(type.id)}
-                          onCheckedChange={() => toggleFilter(type.id)}
+                          checked={filters.propertyTypes.includes(type.id)}
+                          onCheckedChange={() => toggleArrayFilter('propertyTypes', type.id)}
                         />
                         <label htmlFor={type.id} className="text-sm flex-1">
                           {type.label}
@@ -291,8 +443,8 @@ const SearchResults = () => {
                       <div key={rating.id} className="flex items-center space-x-2">
                         <Checkbox 
                           id={rating.id}
-                          checked={selectedFilters.includes(rating.id)}
-                          onCheckedChange={() => toggleFilter(rating.id)}
+                          checked={filters.guestRating.includes(rating.id)}
+                          onCheckedChange={() => toggleArrayFilter('guestRating', rating.id)}
                         />
                         <label htmlFor={rating.id} className="text-sm flex-1">
                           {rating.label}
@@ -313,8 +465,8 @@ const SearchResults = () => {
                       <div key={distance.id} className="flex items-center space-x-2">
                         <Checkbox 
                           id={distance.id}
-                          checked={selectedFilters.includes(distance.id)}
-                          onCheckedChange={() => toggleFilter(distance.id)}
+                          checked={filters.distance.includes(distance.id)}
+                          onCheckedChange={() => toggleArrayFilter('distance', distance.id)}
                         />
                         <label htmlFor={distance.id} className="text-sm flex-1">
                           {distance.label}
@@ -335,8 +487,8 @@ const SearchResults = () => {
                       <div key={meal.id} className="flex items-center space-x-2">
                         <Checkbox 
                           id={meal.id}
-                          checked={selectedFilters.includes(meal.id)}
-                          onCheckedChange={() => toggleFilter(meal.id)}
+                          checked={filters.meals.includes(meal.id)}
+                          onCheckedChange={() => toggleArrayFilter('meals', meal.id)}
                         />
                         <label htmlFor={meal.id} className="text-sm flex-1">
                           {meal.label}
@@ -357,8 +509,8 @@ const SearchResults = () => {
                       <div key={deal.id} className="flex items-center space-x-2">
                         <Checkbox 
                           id={deal.id}
-                          checked={selectedFilters.includes(deal.id)}
-                          onCheckedChange={() => toggleFilter(deal.id)}
+                          checked={filters.deals.includes(deal.id)}
+                          onCheckedChange={() => toggleArrayFilter('deals', deal.id)}
                         />
                         <label htmlFor={deal.id} className="text-sm flex-1">
                           {deal.label}
@@ -379,8 +531,8 @@ const SearchResults = () => {
                       <div key={filter.id} className="flex items-center space-x-2">
                         <Checkbox 
                           id={filter.id}
-                          checked={selectedFilters.includes(filter.id)}
-                          onCheckedChange={() => toggleFilter(filter.id)}
+                          checked={filters.amenities.includes(filter.id)}
+                          onCheckedChange={() => toggleArrayFilter('amenities', filter.id)}
                         />
                         <label htmlFor={filter.id} className="text-sm flex-1">
                           {filter.label}
@@ -399,10 +551,22 @@ const SearchResults = () => {
             {/* Results Header */}
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-xl font-semibold">Avrupa'da 3,269 tesis</h2>
+                <h2 className="text-xl font-semibold">
+                  {loading ? (
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="animate-spin" size={20} />
+                      Aranıyor...
+                    </div>
+                  ) : (
+                    `Avrupa'da ${totalResults.toLocaleString()} tesis`
+                  )}
+                </h2>
                 <p className="text-gray-600 mt-1">Aramanız için en iyi seçenekler</p>
               </div>
-              <Select defaultValue="recommended">
+              <Select 
+                value={filters.sortBy}
+                onValueChange={(value) => updateFilter('sortBy', value)}
+              >
                 <SelectTrigger className="w-48">
                   <SelectValue />
                 </SelectTrigger>
@@ -417,8 +581,21 @@ const SearchResults = () => {
             </div>
 
             {/* Hotel Cards */}
-            <div className="space-y-4">
-              {hotels.map((hotel) => (
+            {loading ? (
+              <div className="flex justify-center items-center py-12">
+                <div className="text-center">
+                  <Loader2 className="animate-spin mx-auto mb-4" size={32} />
+                  <p className="text-gray-600">Oteller yükleniyor...</p>
+                </div>
+              </div>
+            ) : hotels.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-gray-600 text-lg">Arama kriterlerinize uygun otel bulunamadı.</p>
+                <p className="text-gray-500 mt-2">Filtrelerinizi değiştirmeyi deneyin.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {hotels.map((hotel) => (
                 <Card key={hotel.id} className="overflow-hidden hover:shadow-md transition-shadow">
                   <CardContent className="p-0">
                     <div className="flex h-48">
@@ -522,8 +699,9 @@ const SearchResults = () => {
                     </div>
                   </CardContent>
                 </Card>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
