@@ -111,10 +111,15 @@ const SearchResults = () => {
         params.append('stars', stars);
       }
 
-      const response = await fetch(`${apiBase}/hotels?${params}`, {
+      // CORS proxy kullan
+      const proxyUrl = 'https://api.allorigins.win/raw?url=';
+      const targetUrl = encodeURIComponent(`${apiBase}/hotels?${params}`);
+      
+      console.log('API URL:', `${apiBase}/hotels?${params}`);
+      
+      const response = await fetch(`${proxyUrl}${targetUrl}`, {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
           'Accept': 'application/json'
         }
       });
@@ -124,6 +129,7 @@ const SearchResults = () => {
       }
       
       const data = await response.json();
+      console.log('API Response:', data);
       
       // API response'ını Hotel interface'ine dönüştür
       const hotels: Hotel[] = (data.hotels || data.results || data || []).map((hotel: any, index: number) => ({
