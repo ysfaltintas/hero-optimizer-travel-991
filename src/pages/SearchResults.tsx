@@ -75,6 +75,8 @@ const SearchResults = () => {
   // API call function
   const searchHotels = async (searchFilters: SearchFilters) => {
     setLoading(true);
+    console.log('🔍 Starting hotel search for:', searchFilters.location);
+    
     try {
       const apiBaseUrl = 'https://hotel-api-qndt.onrender.com';
       
@@ -82,10 +84,11 @@ const SearchResults = () => {
       
       // Hotel API ile otelleri al
       if (searchFilters.location) {
-        console.log('Searching for hotels in:', searchFilters.location);
+        console.log('📍 Searching for hotels in:', searchFilters.location);
         
+        // Method 1: Direct API call (will likely fail due to CORS)
         try {
-          // CORS proxy kullanarak API çağrısı yap
+          console.log('🚀 Attempting direct API call...');
           const searchParams = new URLSearchParams({
             location: searchFilters.location,
             checkIn: searchFilters.checkIn || '2024-12-25',
@@ -95,33 +98,25 @@ const SearchResults = () => {
             rooms: searchFilters.rooms.toString()
           });
 
-          // AllOrigins CORS proxy kullan
-          const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(`${apiBaseUrl}/search?${searchParams}`)}`;
-          console.log('Making API call through proxy:', proxyUrl);
+          const directUrl = `${apiBaseUrl}/search?${searchParams}`;
+          console.log('📡 Direct API URL:', directUrl);
           
-          const response = await fetch(proxyUrl, {
+          const response = await fetch(directUrl, {
             method: 'GET',
             headers: {
-              'Accept': 'application/json'
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
             }
           });
           
+          console.log('📥 Direct API response status:', response.status);
+          
           if (response.ok) {
-            const proxyData = await response.json();
-            console.log('Proxy response:', proxyData);
+            const data = await response.json();
+            console.log('✅ Direct API success! Data:', data);
             
-            // API'dan JSON response gelirse parse et
-            let apiData;
-            try {
-              apiData = JSON.parse(proxyData.contents);
-            } catch (parseError) {
-              console.log('API response is not JSON, using as text:', proxyData.contents);
-              // Eğer API'dan HTML geliyorsa başka endpoint dene
-              throw new Error('API returned non-JSON response');
-            }
-            
-            if (apiData && apiData.hotels && apiData.hotels.length > 0) {
-              hotels = apiData.hotels.map((hotel: any) => ({
+            if (data.hotels && data.hotels.length > 0) {
+              hotels = data.hotels.map((hotel: any) => ({
                 id: hotel.id || Math.random(),
                 name: hotel.name || 'Hotel Name',
                 location: `${hotel.location || searchFilters.location}`,
@@ -141,23 +136,44 @@ const SearchResults = () => {
                 freeCancellation: hotel.freeCancellation !== undefined ? hotel.freeCancellation : true,
                 stars: parseInt(hotel.stars || '4')
               }));
-              console.log('Processed hotels from API:', hotels);
+              console.log('🏨 Processed hotels from direct API:', hotels.length);
             }
           } else {
-            console.error('Proxy API response not ok:', response.status, response.statusText);
+            console.log('❌ Direct API failed with status:', response.status, response.statusText);
           }
-        } catch (apiError) {
-          console.error('API call failed:', apiError);
+        } catch (directError) {
+          console.log('💥 Direct API call failed:', directError);
           
-          // Alternatif proxy dene
+          // Method 2: Try different CORS proxy approaches
+          console.log('🔄 Trying CORS bypass methods...');
+          
           try {
-            console.log('Trying alternative proxy...');
-            const altProxyUrl = `https://corsproxy.io/?${encodeURIComponent(`${apiBaseUrl}/hotels`)}`;
+            // Simple fetch with no-cors mode (limited but might work)
+            console.log('🆘 Attempting no-cors fetch...');
+            const noCorsResponse = await fetch(`${apiBaseUrl}/hotels`, {
+              method: 'GET',
+              mode: 'no-cors',
+              headers: {
+                'Accept': 'application/json'
+              }
+            });
+            console.log('📊 No-cors response:', noCorsResponse);
+          } catch (noCorsError) {
+            console.log('💥 No-cors also failed:', noCorsError);
+          }
+          
+          // Method 3: Try jsonp-like approach
+          try {
+            console.log('🔗 Trying alternative proxy service...');
+            const altProxyUrl = `https://thingproxy.freeboard.io/fetch/${apiBaseUrl}/hotels`;
+            console.log('🌐 Alternative proxy URL:', altProxyUrl);
+            
             const altResponse = await fetch(altProxyUrl);
+            console.log('📈 Alternative proxy response status:', altResponse.status);
             
             if (altResponse.ok) {
               const altData = await altResponse.json();
-              console.log('Alternative proxy response:', altData);
+              console.log('🎉 Alternative proxy success! Data:', altData);
               
               if (altData && altData.hotels && altData.hotels.length > 0) {
                 hotels = altData.hotels.map((hotel: any) => ({
@@ -180,10 +196,13 @@ const SearchResults = () => {
                   freeCancellation: hotel.freeCancellation !== undefined ? hotel.freeCancellation : true,
                   stars: parseInt(hotel.stars || '4')
                 }));
+                console.log('🏨 Processed hotels from alternative proxy:', hotels.length);
               }
+            } else {
+              console.log('❌ Alternative proxy failed with status:', altResponse.status);
             }
           } catch (altError) {
-            console.error('Alternative proxy also failed:', altError);
+            console.log('💥 Alternative proxy also failed:', altError);
           }
         }
       }
