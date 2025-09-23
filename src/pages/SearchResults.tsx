@@ -6,13 +6,14 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import TopBar from "@/components/layout/TopBar";
 import { Hotel, SearchFilters } from "@/types/hotel";
 import { hotelService } from "@/services/hotelService";
 
 const SearchResults = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [hotels, setHotels] = useState<Hotel[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalResults, setTotalResults] = useState(0);
@@ -523,7 +524,20 @@ const SearchResults = () => {
             ) : (
               <div className="space-y-4">
                 {hotels.map((hotel) => (
-                <Card key={hotel.id} className="overflow-hidden hover:shadow-md transition-shadow">
+                <Card 
+                  key={hotel.id} 
+                  className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+                  onClick={() => {
+                    const params = new URLSearchParams();
+                    params.set('location', filters.location);
+                    params.set('checkIn', filters.checkIn);
+                    params.set('checkOut', filters.checkOut);
+                    params.set('adults', filters.adults.toString());
+                    params.set('children', filters.children.toString());
+                    params.set('rooms', filters.rooms.toString());
+                    navigate(`/hotels/${hotel.id}?${params.toString()}`);
+                  }}
+                >
                   <CardContent className="p-0">
                     <div className="flex h-48">
                       {/* Hotel Image */}
