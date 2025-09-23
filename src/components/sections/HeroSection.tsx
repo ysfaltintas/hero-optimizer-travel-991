@@ -44,10 +44,9 @@ const HeroSection = () => {
     setError(null);
 
     try {
-      const apiBaseUrl = 'https://hotel-api-qndt.onrender.com';
-      
+      // Navigate to search page with parameters instead of making API call here
       const params = new URLSearchParams({
-        location: location,
+        location,
         checkIn: format(dateRange.from, 'yyyy-MM-dd'),
         checkOut: format(dateRange.to, 'yyyy-MM-dd'),
         adults: guests.adults.toString(),
@@ -55,20 +54,9 @@ const HeroSection = () => {
         rooms: guests.rooms.toString()
       });
 
-      const response = await fetch(`${apiBaseUrl}/search?${params}`, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`API hatası: ${response.status}`);
-      }
-
-      const data = await response.json();
-      setSearchResults(data);
+      // Redirect to search results page
+      window.location.href = `/search?${params.toString()}`;
+      
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Bir hata oluştu');
     } finally {
