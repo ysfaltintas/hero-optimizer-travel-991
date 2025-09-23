@@ -76,149 +76,63 @@ const SearchResults = () => {
   const searchHotels = async (searchFilters: SearchFilters) => {
     setLoading(true);
     try {
-      const apiKey = import.meta.env.VITE_API_KEY || '68c8189c315cbb1572767dd3';
-
-      if (!apiKey) {
-        throw new Error('API key missing');
-      }
-
+      const apiBaseUrl = 'https://hotel-api-qndt.onrender.com';
+      
       let hotels: Hotel[] = [];
       
-      // Eğer lokasyon varsa city ID'yi al, yoksa varsayılan otelleri göster
+      // Hotel API ile otelleri al
       if (searchFilters.location) {
-        console.log('Searching for city:', searchFilters.location);
+        console.log('Searching for hotels in:', searchFilters.location);
         
         try {
-          // Önce direkt API çağrısı dene
-          const mappingUrl = `https://api.makcorps.com/mapping?api_key=${apiKey}&name=${encodeURIComponent(searchFilters.location)}`;
-          const mappingResponse = await fetch(mappingUrl, {
+          const searchParams = new URLSearchParams({
+            location: searchFilters.location,
+            checkIn: searchFilters.checkIn || '2024-12-25',
+            checkOut: searchFilters.checkOut || '2024-12-26',
+            adults: searchFilters.adults.toString(),
+            children: searchFilters.children.toString(),
+            rooms: searchFilters.rooms.toString()
+          });
+
+          const response = await fetch(`${apiBaseUrl}/search?${searchParams}`, {
             method: 'GET',
             headers: {
               'Accept': 'application/json',
+              'Content-Type': 'application/json'
             }
           });
           
-          if (mappingResponse.ok) {
-            const mappingData = await mappingResponse.json();
-            console.log('City mapping response:', mappingData);
+          if (response.ok) {
+            const data = await response.json();
+            console.log('Hotel API response:', data);
             
-            if (mappingData.data && mappingData.data.length > 0) {
-              const cityId = mappingData.data[0].document_id;
-              console.log('Found city ID:', cityId);
-              
-              // Hotel API ile otelleri al
-              const hotelParams = new URLSearchParams({
-                api_key: apiKey,
-                cityid: cityId,
-                pagination: '0',
-                cur: 'USD',
-                rooms: searchFilters.rooms.toString(),
-                adults: searchFilters.adults.toString(),
-                checkin: searchFilters.checkIn || '2024-12-25',
-                checkout: searchFilters.checkOut || '2024-12-26',
-                children: searchFilters.children.toString()
-              });
-
-              const hotelUrl = `https://api.makcorps.com/city?${hotelParams}`;
-              const hotelResponse = await fetch(hotelUrl, {
-                method: 'GET',
-                headers: {
-                  'Accept': 'application/json',
-                }
-              });
-              
-              if (hotelResponse.ok) {
-                const hotelData = await hotelResponse.json();
-                console.log('Hotel API response:', hotelData);
-                
-                if (hotelData.data && hotelData.data.length > 0) {
-                  hotels = hotelData.data.map((hotel: any) => ({
-                    id: hotel.id || Math.random(),
-                    name: hotel.hotel_name || hotel.name || 'Hotel Name',
-                    location: hotel.address || hotel.location || searchFilters.location,
-                    distance: hotel.distance_text || '1 km to city center',
-                    image: hotel.main_photo || '/lovable-uploads/e6764045-1a5d-4f3d-80b8-d6ba711e528d.png',
-                    rating: parseFloat(hotel.review_score || hotel.rating || '4.5'),
-                    reviews: parseInt(hotel.review_nr || hotel.reviews || '1000'),
-                    roomType: hotel.room_type || 'Standard Room',
-                    bedType: hotel.bed_type || '1 double bed',
-                    amenities: hotel.facilities || ['WiFi', 'Breakfast'],
-                    price: parseInt(hotel.min_total_price || hotel.price || '100'),
-                    originalPrice: parseInt(hotel.min_total_price || hotel.price || '120'),
-                    nights: searchFilters.checkIn && searchFilters.checkOut ? 
-                      Math.ceil((new Date(searchFilters.checkOut).getTime() - new Date(searchFilters.checkIn).getTime()) / (1000 * 60 * 60 * 24)) || 1 : 1,
-                    guests: searchFilters.adults + searchFilters.children,
-                    taxes: 50,
-                    freeCancellation: hotel.free_cancellation || true,
-                    stars: parseInt(hotel.class || hotel.stars || '4')
-                  }));
-                }
-              }
+            if (data.hotels && data.hotels.length > 0) {
+              hotels = data.hotels.map((hotel: any) => ({
+                id: hotel.id || Math.random(),
+                name: hotel.name || 'Hotel Name',
+                location: hotel.location || searchFilters.location,
+                distance: hotel.distance || '1 km to city center',
+                image: hotel.image || '/lovable-uploads/e6764045-1a5d-4f3d-80b8-d6ba711e528d.png',
+                rating: parseFloat(hotel.rating || '4.5'),
+                reviews: parseInt(hotel.reviews || '1000'),
+                roomType: hotel.roomType || 'Standard Room',
+                bedType: hotel.bedType || '1 double bed',
+                amenities: hotel.amenities || ['WiFi', 'Breakfast'],
+                price: parseInt(hotel.price || '100'),
+                originalPrice: parseInt(hotel.originalPrice || hotel.price || '120'),
+                nights: searchFilters.checkIn && searchFilters.checkOut ? 
+                  Math.ceil((new Date(searchFilters.checkOut).getTime() - new Date(searchFilters.checkIn).getTime()) / (1000 * 60 * 60 * 24)) || 1 : 1,
+                guests: searchFilters.adults + searchFilters.children,
+                taxes: hotel.taxes || 50,
+                freeCancellation: hotel.freeCancellation !== undefined ? hotel.freeCancellation : true,
+                stars: parseInt(hotel.stars || '4')
+              }));
             }
+          } else {
+            console.error('API response not ok:', response.status, response.statusText);
           }
-        } catch (directError) {
-          console.log('Direct API call failed, trying with CORS proxy...', directError);
-          
-          // Fallback: CORS proxy kullan
-          try {
-            const mappingResponse = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(`https://api.makcorps.com/mapping?api_key=${apiKey}&name=${encodeURIComponent(searchFilters.location)}`)}`);
-            
-            if (mappingResponse.ok) {
-              const mappingData = await mappingResponse.json();
-              const parsedMapping = JSON.parse(mappingData.contents);
-              console.log('City mapping response (proxy):', parsedMapping);
-              
-              if (parsedMapping.data && parsedMapping.data.length > 0) {
-                const cityId = parsedMapping.data[0].document_id;
-                console.log('Found city ID (proxy):', cityId);
-                
-                const hotelParams = new URLSearchParams({
-                  api_key: apiKey,
-                  cityid: cityId,
-                  pagination: '0',
-                  cur: 'USD',
-                  rooms: searchFilters.rooms.toString(),
-                  adults: searchFilters.adults.toString(),
-                  checkin: searchFilters.checkIn || '2024-12-25',
-                  checkout: searchFilters.checkOut || '2024-12-26',
-                  children: searchFilters.children.toString()
-                });
-
-                const hotelResponse = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(`https://api.makcorps.com/city?${hotelParams}`)}`);
-                
-                if (hotelResponse.ok) {
-                  const hotelData = await hotelResponse.json();
-                  const parsedHotels = JSON.parse(hotelData.contents);
-                  console.log('Hotel API response (proxy):', parsedHotels);
-                  
-                  if (parsedHotels.data && parsedHotels.data.length > 0) {
-                    hotels = parsedHotels.data.map((hotel: any) => ({
-                      id: hotel.id || Math.random(),
-                      name: hotel.hotel_name || hotel.name || 'Hotel Name',
-                      location: hotel.address || hotel.location || searchFilters.location,
-                      distance: hotel.distance_text || '1 km to city center',
-                      image: hotel.main_photo || '/lovable-uploads/e6764045-1a5d-4f3d-80b8-d6ba711e528d.png',
-                      rating: parseFloat(hotel.review_score || hotel.rating || '4.5'),
-                      reviews: parseInt(hotel.review_nr || hotel.reviews || '1000'),
-                      roomType: hotel.room_type || 'Standard Room',
-                      bedType: hotel.bed_type || '1 double bed',
-                      amenities: hotel.facilities || ['WiFi', 'Breakfast'],
-                      price: parseInt(hotel.min_total_price || hotel.price || '100'),
-                      originalPrice: parseInt(hotel.min_total_price || hotel.price || '120'),
-                      nights: searchFilters.checkIn && searchFilters.checkOut ? 
-                        Math.ceil((new Date(searchFilters.checkOut).getTime() - new Date(searchFilters.checkIn).getTime()) / (1000 * 60 * 60 * 24)) || 1 : 1,
-                      guests: searchFilters.adults + searchFilters.children,
-                      taxes: 50,
-                      freeCancellation: hotel.free_cancellation || true,
-                      stars: parseInt(hotel.class || hotel.stars || '4')
-                    }));
-                  }
-                }
-              }
-            }
-          } catch (proxyError) {
-            console.error('Both direct and proxy API calls failed:', proxyError);
-          }
+        } catch (apiError) {
+          console.error('API call failed:', apiError);
         }
       }
       

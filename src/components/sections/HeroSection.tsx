@@ -44,20 +44,21 @@ const HeroSection = () => {
     setError(null);
 
     try {
-      const apiBase = import.meta.env.VITE_API_BASE || 'https://api.example.com';
-      const apiKey = import.meta.env.VITE_API_KEY || 'your-api-key';
+      const apiBaseUrl = 'https://hotel-api-qndt.onrender.com';
       
       const params = new URLSearchParams({
-        city: location,
-        checkin: format(dateRange.from, 'yyyy-MM-dd'),
-        checkout: format(dateRange.to, 'yyyy-MM-dd'),
-        guests: (guests.adults + guests.children).toString()
+        location: location,
+        checkIn: format(dateRange.from, 'yyyy-MM-dd'),
+        checkOut: format(dateRange.to, 'yyyy-MM-dd'),
+        adults: guests.adults.toString(),
+        children: guests.children.toString(),
+        rooms: guests.rooms.toString()
       });
 
-      const response = await fetch(`${apiBase}/hotels?${params}`, {
+      const response = await fetch(`${apiBaseUrl}/search?${params}`, {
         method: 'GET',
         headers: {
-          'x-api-key': apiKey,
+          'Accept': 'application/json',
           'Content-Type': 'application/json'
         }
       });
