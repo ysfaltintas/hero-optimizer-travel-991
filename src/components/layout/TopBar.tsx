@@ -4,7 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 const TopBar = () => {
   return (
-    <div className="absolute top-0 right-0 z-20 p-4 sm:p-6">
+    <div className="absolute top-0 right-0 z-50 p-4 sm:p-6">
       <div className="flex items-center gap-2 sm:gap-3">
         {/* Language Selector */}
         <Select defaultValue="tr">

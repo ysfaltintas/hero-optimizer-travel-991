@@ -170,28 +170,28 @@ const SearchResults = () => {
       <TopBar />
       
       {/* Header */}
-        <div className="bg-white shadow-sm border-b">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex items-center justify-between">
-              <h1 
-                className="text-xl sm:text-2xl font-bold text-gray-900 cursor-pointer hover:text-blue-600 transition-colors"
-                onClick={() => window.location.href = '/'}
-              >
-                Ozvia Travel
-              </h1>
-              
-              {/* Mobile Filter Toggle */}
-              <Button 
-                variant="outline" 
-                className="lg:hidden"
-                onClick={() => setShowMobileFilters(!showMobileFilters)}
-              >
-                <Filter className="mr-2 h-4 w-4" />
-                Filtreler
-              </Button>
-            </div>
+      <div className="bg-white shadow-sm border-b pt-16 lg:pt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            <h1 
+              className="text-xl sm:text-2xl font-bold text-gray-900 cursor-pointer hover:text-blue-600 transition-colors"
+              onClick={() => window.location.href = '/'}
+            >
+              Ozvia Travel
+            </h1>
+            
+            {/* Mobile Filter Toggle */}
+            <Button 
+              variant="outline" 
+              className="lg:hidden min-h-[44px] px-4 touch-manipulation"
+              onClick={() => setShowMobileFilters(!showMobileFilters)}
+            >
+              <Filter className="mr-2 h-4 w-4" />
+              Filtreler
+            </Button>
           </div>
         </div>
+      </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
           <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
@@ -204,7 +204,7 @@ const SearchResults = () => {
             {/* Mobile Filters Overlay */}
             {showMobileFilters && (
               <div 
-                className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+                className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
                 onClick={() => setShowMobileFilters(false)}
               />
             )}
@@ -212,7 +212,7 @@ const SearchResults = () => {
             {/* Mobile Filters Panel */}
             <div className={cn(
               "lg:static lg:bg-transparent lg:shadow-none lg:max-h-none lg:overflow-visible",
-              "fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white shadow-xl z-50 overflow-y-auto",
+              "fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white shadow-xl z-40 overflow-y-auto",
               showMobileFilters ? "translate-x-0" : "translate-x-full lg:translate-x-0",
               "transition-transform duration-300 ease-in-out"
             )}>
