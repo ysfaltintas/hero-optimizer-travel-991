@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MapPin, Star, Heart, ArrowRight, Loader2 } from "lucide-react";
+import { MapPin, Star, Heart, ArrowRight, Loader2, Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -10,6 +10,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import TopBar from "@/components/layout/TopBar";
 import { Hotel, SearchFilters } from "@/types/hotel";
 import { hotelService } from "@/services/hotelService";
+import { cn } from "@/lib/utils";
 
 const SearchResults = () => {
   const [searchParams] = useSearchParams();
@@ -17,6 +18,7 @@ const SearchResults = () => {
   const [hotels, setHotels] = useState<Hotel[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalResults, setTotalResults] = useState(0);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
   
   // Filter states
   const [filters, setFilters] = useState<SearchFilters>({
@@ -170,20 +172,63 @@ const SearchResults = () => {
       {/* Header */}
         <div className="bg-white shadow-sm border-b">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <h1 
-              className="text-2xl font-bold text-gray-900 cursor-pointer hover:text-blue-600 transition-colors"
-              onClick={() => window.location.href = '/'}
-            >
-              Ozvia Travel
-            </h1>
+            <div className="flex items-center justify-between">
+              <h1 
+                className="text-xl sm:text-2xl font-bold text-gray-900 cursor-pointer hover:text-blue-600 transition-colors"
+                onClick={() => window.location.href = '/'}
+              >
+                Ozvia Travel
+              </h1>
+              
+              {/* Mobile Filter Toggle */}
+              <Button 
+                variant="outline" 
+                className="lg:hidden"
+                onClick={() => setShowMobileFilters(!showMobileFilters)}
+              >
+                <Filter className="mr-2 h-4 w-4" />
+                Filtreler
+              </Button>
+            </div>
           </div>
         </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex gap-8">
-          {/* Left Sidebar - Filters */}
-          <div className="w-80 shrink-0">
-            <div className="space-y-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+          <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+          {/* Left Sidebar - Filters - Desktop */}
+          <div className={cn(
+            "w-full lg:w-80 lg:shrink-0",
+            "lg:block",
+            showMobileFilters ? "block" : "hidden lg:block"
+          )}>
+            {/* Mobile Filters Overlay */}
+            {showMobileFilters && (
+              <div 
+                className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+                onClick={() => setShowMobileFilters(false)}
+              />
+            )}
+            
+            {/* Mobile Filters Panel */}
+            <div className={cn(
+              "lg:static lg:bg-transparent lg:shadow-none lg:max-h-none lg:overflow-visible",
+              "fixed top-0 right-0 h-full w-80 max-w-[85vw] bg-white shadow-xl z-50 overflow-y-auto",
+              showMobileFilters ? "translate-x-0" : "translate-x-full lg:translate-x-0",
+              "transition-transform duration-300 ease-in-out"
+            )}>
+              {/* Mobile Close Button */}
+              <div className="lg:hidden flex items-center justify-between p-4 border-b">
+                <h2 className="text-lg font-semibold">Filtreler</h2>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  onClick={() => setShowMobileFilters(false)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+              
+              <div className="p-4 lg:p-0 space-y-4 sm:space-y-6">
               {/* Location */}
               <Card>
                 <CardContent className="p-4">
@@ -471,6 +516,7 @@ const SearchResults = () => {
                   </div>
                 </CardContent>
               </Card>
+              </div>
             </div>
           </div>
 
